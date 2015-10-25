@@ -54,9 +54,10 @@ namespace Cocoa
                 }
                 catch
                 {
-                    packagePageUri = ChocolateyPackage + name;
+                    packagePageUri = ChocolateyPackage + packageName;
                 }
                 var isApproved = nodes[3].Value.ToLower() == @"approved";
+                var pkgName = packageName;
 
                 result.Add(new PackageInfo
                 {
@@ -64,6 +65,7 @@ namespace Cocoa
                     Version = version,
                     PackagePageUri = packagePageUri,
                     IsApproved = isApproved,
+                    PackageName = pkgName,
                 });
             }
 

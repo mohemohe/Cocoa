@@ -23,8 +23,6 @@ namespace Cocoa
 
         static void Main(string[] args)
         {
-            //args = new string[] { "-Sa", "mery", "--noconfirm" };
-
             if (args.Length == 0)
                 Cocoa.Version();
 
