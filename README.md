@@ -1,5 +1,5 @@
 # Cocoa
-pacman style chocolatey wrapper. supports non-approved package (in future).
+pacman style chocolatey wrapper. supports non-approved package.
 
 ## Download binary
 

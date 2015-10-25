@@ -1,0 +1,25 @@
+﻿Usage: Cocoa [SWITCH [PACKAGES]] [OPTION]...
+
+Switches
+  -S,  install	    install packages.
+  -Sa               install non-approved packages.
+  -Su  upgrade      upgrade packages.
+  -Ss  list         show list of available packages.
+  -Ssa              show list of available packages (includes non-approved).
+  -Sq               show list of installed packages.
+  -R,  uninstall    uninstall packages.
+
+  --version         output version of Chocolatey and Cocoa.
+  --help            output this help message.
+
+Options
+  -y,  --noconfirm  suppress dialog.
+  --nonapproved     install, or search non-approved packages.
+  --localonly       show list of installed packages.
+
+Example
+  install non-approved package of Mery and suppress dialog.
+    Cocoa install mery --nonapproved --noconfirm
+
+  or you can replace "install" and "--nonapproved" to "-Sa".
+    Cocoa -Sa mery --noconfirm
