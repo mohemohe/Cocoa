@@ -13,6 +13,7 @@ namespace Cocoa
 
         public string Name { get; set; }
         public string Version { get; set; }
+        public string PackageName { get; set; }
         public string PackagePageUri { get; set; }
         public bool IsApproved { get; set; }
 
@@ -20,7 +21,7 @@ namespace Cocoa
         {
             get
             {
-                return new Uri(new Uri(ChocolateyApi), Name + @"/" + Version).ToString();
+                return new Uri(new Uri(ChocolateyApi), PackageName + @"/" + Version).ToString();
             }
         }
 
