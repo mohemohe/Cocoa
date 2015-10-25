@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Mime;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +21,14 @@ namespace Cocoa
             using (var choco = new ChocolateyHost())
             {
                 choco.Exec();
+            }
+        }
+
+        public static void Help()
+        {
+            using (var sr = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Cocoa.Help.txt")))
+            {
+                Console.WriteLine(sr.ReadToEnd());
             }
         }
 
@@ -66,6 +77,70 @@ namespace Cocoa
             {
                 sb.Append(@" --localonly");
             }
+
+            using (var choco = new ChocolateyHost())
+            {
+                choco.ExecInteractive(sb.ToString());
+            }
+        }
+
+        public static void ShowNonApprovedPackagesList(IEnumerable<string> packages)
+        {
+            var count = 0;
+            packages.ToList().ForEach(x => 
+            {
+                Console.WriteLine(Crawler.GetPackageInfos(x).ToList()[0].ToString());
+                count++;
+            });
+
+            Console.WriteLine(count + @" packages found.");
+        }
+
+        public static async Task InstallNonApprovedPackages(IEnumerable<string> packages)
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), @"cocoa");
+            if (!Directory.Exists(tempDir))
+            {
+                Directory.CreateDirectory(tempDir);
+            }
+
+            foreach(var package in packages)
+            {
+                if (package.StartsWith(@"-"))
+                {
+                    continue;
+                }
+
+                var packageInfos = Crawler.GetPackageInfos(package);
+                if(!package.Any())
+                {
+                    continue;
+                }
+
+                var packageInfo = packageInfos.ToList()[0];
+                string fileName;
+                string filePath;
+                using (var hc = new HttpClient())
+                {
+                    var res = hc.GetAsync(packageInfo.DownloadUri, HttpCompletionOption.ResponseHeadersRead).Result;
+                    fileName = Path.GetFileName(res.RequestMessage.RequestUri.ToString());
+                    filePath = Path.Combine(tempDir, fileName);
+
+                    using (var fs = File.Create(filePath))
+                    {
+                        using (var s = res.Content.ReadAsStreamAsync().Result)
+                        {
+                            s.CopyTo(fs);
+                            fs.Flush();
+                        }
+                    }
+                }
+            }
+
+            var sb = new StringBuilder();
+            sb.Append(@"install");
+            packages.ToList().ForEach(x => sb.Append(@" " + x));
+            sb.Append(@" -source " + tempDir);
 
             using (var choco = new ChocolateyHost())
             {

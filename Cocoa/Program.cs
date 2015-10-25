@@ -8,22 +8,31 @@ namespace Cocoa
 {
     static class Program
     {
-        static bool ShowVersion;
+        static bool IsShowVersion;
+        static bool IsShowHelp;
         static bool IsShowPackagesList;
+        static bool IsShowNonApprovedPackagesList;
         static bool IsShowLocalPackagesList;
         static List<string> ListPackages = new List<string>();
+        static bool IsInstallNonApprovedPackages;
         static List<string> InstallPackages = new List<string>();
         static List<string> UninstallPackages = new List<string>();
         static List<string> UpgradePackages = new List<string>();
         static bool IsNoConfirm;
+        static bool IsInvalidOperation;
 
         static void Main(string[] args)
         {
+            //args = new string[] { "-Sa", "mery", "--noconfirm" };
+
             if (args.Length == 0)
                 Cocoa.Version();
 
             ParseArgs(args);
-            ExecCocoa();
+            if (!IsInvalidOperation)
+            {
+                ExecCocoa();
+            }
         }
 
         static void ParseArgs(string[] args)
@@ -35,11 +44,24 @@ namespace Cocoa
                 switch (arg)
                 {
                     case @"--version":
-                        ShowVersion = true;
+                        IsShowVersion = true;
+                        break;
+
+                    case @"--help":
+                        IsShowHelp = true;
                         break;
 
                     case @"-S":
                     case @"install":
+                        for (i++; i < args.Length && !args[i].StartsWith("-"); i++)
+                        {
+                            InstallPackages.Add(args[i]);
+                        }
+                        i--;
+                        break;
+
+                    case @"-Sa":
+                        IsInstallNonApprovedPackages = true;
                         for (i++; i < args.Length && !args[i].StartsWith("-"); i++)
                         {
                             InstallPackages.Add(args[i]);
@@ -84,6 +106,21 @@ namespace Cocoa
                         i--;
                         break;
 
+                    case @"-Ssa":
+                        IsShowPackagesList = true;
+                        IsShowNonApprovedPackagesList = true;
+                        for (i++; i < args.Length && !args[i].StartsWith("-"); i++)
+                        {
+                            ListPackages.Add(args[i]);
+                        }
+                        i--;
+                        break;
+
+                    case @"--nonapproved":
+                        IsShowNonApprovedPackagesList = true;
+                        IsInstallNonApprovedPackages = true;
+                        break;
+
                     case @"--localonly":
                         IsShowLocalPackagesList = true;
                         break;
@@ -94,6 +131,7 @@ namespace Cocoa
                         break;
 
                     default:
+                        IsInvalidOperation = true;
                         Console.WriteLine(@"Invalid argument '" + arg + @"'.");
                         break;
                 }
@@ -117,7 +155,14 @@ namespace Cocoa
                 {
                     InstallPackages.Add(@"-y");
                 }
-                Cocoa.Install(InstallPackages);
+                if (IsInstallNonApprovedPackages)
+                {
+                    Cocoa.InstallNonApprovedPackages(InstallPackages).Wait();
+                }
+                else
+                {
+                    Cocoa.Install(InstallPackages);
+                }
             }
 
             if (UninstallPackages.Count != 0)
@@ -131,12 +176,24 @@ namespace Cocoa
 
             if (IsShowPackagesList)
             {
-                Cocoa.ShowPackagesList(ListPackages, IsShowLocalPackagesList);
+                if (IsShowNonApprovedPackagesList)
+                {
+                    Cocoa.ShowNonApprovedPackagesList(ListPackages);
+                }
+                else
+                {
+                    Cocoa.ShowPackagesList(ListPackages, IsShowLocalPackagesList);
+                }
             }
 
-            if (ShowVersion)
+            if (IsShowVersion)
             {
                 Cocoa.Version();
+            }
+
+            if (IsShowHelp)
+            {
+                Cocoa.Help();
             }
         }
     }
