@@ -56,5 +56,21 @@ namespace Cocoa
                 choco.ExecInteractive(sb.ToString());
             }
         }
+
+        public static void ShowPackagesList(IEnumerable<string> packages, bool isLocalPackages = false)
+        {
+            var sb = new StringBuilder();
+            sb.Append(@"list");
+            packages.ToList().ForEach(x => sb.Append(@" " + x));
+            if (isLocalPackages)
+            {
+                sb.Append(@" --localonly");
+            }
+
+            using (var choco = new ChocolateyHost())
+            {
+                choco.ExecInteractive(sb.ToString());
+            }
+        }
     }
 }

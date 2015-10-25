@@ -9,6 +9,9 @@ namespace Cocoa
     static class Program
     {
         static bool ShowVersion;
+        static bool IsShowPackagesList;
+        static bool IsShowLocalPackagesList;
+        static List<string> ListPackages = new List<string>();
         static List<string> InstallPackages = new List<string>();
         static List<string> UninstallPackages = new List<string>();
         static List<string> UpgradePackages = new List<string>();
@@ -59,7 +62,30 @@ namespace Cocoa
                         {
                             UpgradePackages.Add(args[i]);
                         }
+                        if(UpgradePackages.Count == 0)
+                        {
+                            UpgradePackages.Add(@"all");
+                        }
                         i--;
+                        break;
+
+                    case @"-Ss":
+                    case @"-Sq":
+                    case @"list":
+                        IsShowPackagesList = true;
+                        if(arg == @"-Sq")
+                        {
+                            IsShowLocalPackagesList = true;
+                        }
+                        for (i++; i < args.Length && !args[i].StartsWith("-"); i++)
+                        {
+                            ListPackages.Add(args[i]);
+                        }
+                        i--;
+                        break;
+
+                    case @"--localonly":
+                        IsShowLocalPackagesList = true;
                         break;
 
                     case @"-y":
@@ -101,6 +127,11 @@ namespace Cocoa
                     UninstallPackages.Add(@"-y");
                 }
                 Cocoa.Uninstall(UninstallPackages);
+            }
+
+            if (IsShowPackagesList)
+            {
+                Cocoa.ShowPackagesList(ListPackages, IsShowLocalPackagesList);
             }
 
             if (ShowVersion)
