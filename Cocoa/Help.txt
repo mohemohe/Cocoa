@@ -1,10 +1,10 @@
-﻿Usage: Cocoa [SWITCH [PACKAGES]] [OPTION]...
+﻿Usage: Cocoa.exe [SWITCH [PACKAGES]] [OPTION]...
 
 Switches
   -S,  install	    install packages.
   -Sa               install non-approved packages.
-  -Su  upgrade      upgrade packages.
-  -Ss  list         show list of available packages.
+  -Su, upgrade      upgrade packages.
+  -Ss, list         show list of available packages.
   -Ssa              show list of available packages (includes non-approved).
   -Sq               show list of installed packages.
   -R,  uninstall    uninstall packages.
@@ -19,7 +19,7 @@ Options
 
 Example
   install non-approved package of Mery and suppress dialog.
-    Cocoa install mery --nonapproved --noconfirm
+    cocoa install mery --nonapproved --noconfirm
 
   or you can replace "install" and "--nonapproved" to "-Sa".
-    Cocoa -Sa mery --noconfirm
+    cocoa -Sa mery --noconfirm
