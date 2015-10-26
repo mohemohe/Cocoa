@@ -109,11 +109,13 @@ namespace Cocoa
             }
 
             var availablePackages = new List<string>();
+            var args = new List<string>();
 
             foreach(var package in packages)
             {
                 if (package.StartsWith(@"-"))
                 {
+                    args.Add(package);
                     continue;
                 }
 
@@ -151,6 +153,7 @@ namespace Cocoa
                 var sb = new StringBuilder();
                 sb.Append(@"install");
                 availablePackages.ForEach(x => sb.Append(@" " + x));
+                args.ForEach(x => sb.Append(@" " + x));
                 sb.Append(@" -source " + tempDir);
 
                 using (var choco = new ChocolateyHost())
