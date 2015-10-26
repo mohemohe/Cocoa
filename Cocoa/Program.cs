@@ -29,7 +29,7 @@ namespace Cocoa
             ParseArgs(args);
             if (!IsInvalidOperation)
             {
-                ExecCocoa();
+                Task.Run(() => ExecCocoa()).Wait();
             }
         }
 
