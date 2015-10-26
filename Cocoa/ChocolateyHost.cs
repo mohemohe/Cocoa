@@ -75,8 +75,20 @@ namespace Cocoa
             Chocolatey.BeginErrorReadLine();
 
             Chocolatey.Exited += (sender, e) => Dispose();
-            Chocolatey.OutputDataReceived += (sender, e) => Console.WriteLine(e.Data);
-            Chocolatey.ErrorDataReceived += (sender, e) => Console.WriteLine(e.Data);
+            Chocolatey.OutputDataReceived += (sender, e) => 
+            {
+                if (e.Data != null)
+                {
+                    Console.WriteLine(e.Data);
+                }
+            };
+            Chocolatey.ErrorDataReceived += (sender, e) => 
+            {
+                if (e.Data != null)
+                {
+                    Console.WriteLine(e.Data);
+                }
+            };
 
             TaskKeeper();
         }

@@ -19,6 +19,7 @@ namespace Cocoa
         static List<string> UninstallPackages = new List<string>();
         static List<string> UpgradePackages = new List<string>();
         static bool IsNoConfirm;
+        static bool IsForce;
         static bool IsInvalidOperation;
 
         static void Main(string[] args)
@@ -29,7 +30,7 @@ namespace Cocoa
             ParseArgs(args);
             if (!IsInvalidOperation)
             {
-                ExecCocoa();
+                Task.Run(() => ExecCocoa()).Wait();
             }
         }
 
@@ -128,6 +129,10 @@ namespace Cocoa
                         IsNoConfirm = true;
                         break;
 
+                    case @"--force":
+                        IsForce = true;
+                        break;
+
                     default:
                         IsInvalidOperation = true;
                         Console.WriteLine(@"Invalid argument '" + arg + @"'.");
@@ -144,6 +149,10 @@ namespace Cocoa
                 {
                     UpgradePackages.Add(@"-y");
                 }
+                if (IsForce)
+                {
+                    UpgradePackages.Add(@"--force");
+                }
                 Cocoa.Upgrade(UpgradePackages);
             }
 
@@ -152,6 +161,10 @@ namespace Cocoa
                 if (IsNoConfirm)
                 {
                     InstallPackages.Add(@"-y");
+                }
+                if (IsForce)
+                {
+                    InstallPackages.Add(@"--force");
                 }
                 if (IsInstallNonApprovedPackages)
                 {
@@ -168,6 +181,10 @@ namespace Cocoa
                 if (IsNoConfirm)
                 {
                     UninstallPackages.Add(@"-y");
+                }
+                if (IsForce)
+                {
+                    UninstallPackages.Add(@"--force");
                 }
                 Cocoa.Uninstall(UninstallPackages);
             }
