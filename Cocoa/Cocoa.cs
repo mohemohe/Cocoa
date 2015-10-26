@@ -89,8 +89,12 @@ namespace Cocoa
             var count = 0;
             packages.ToList().ForEach(x => 
             {
-                Console.WriteLine(Crawler.GetPackageInfos(x).ToList()[0].ToString());
-                count++;
+                var packageInfo = Crawler.GetPackageInfos(x);
+                if (packageInfo != null && packageInfo.Count() != 0)
+                {
+                    Console.WriteLine(packageInfo.ToList()[0].ToString());
+                    count++;
+                }
             });
 
             Console.WriteLine(count + @" packages found.");
@@ -104,6 +108,8 @@ namespace Cocoa
                 Directory.CreateDirectory(tempDir);
             }
 
+            var availablePackages = new List<string>();
+
             foreach(var package in packages)
             {
                 if (package.StartsWith(@"-"))
@@ -112,10 +118,13 @@ namespace Cocoa
                 }
 
                 var packageInfos = Crawler.GetPackageInfos(package);
-                if(!package.Any())
+                if (packageInfos == null || !packageInfos.Any())
                 {
+                    Console.WriteLine(@"'" + package + @"' was not found.");
                     continue;
                 }
+
+                availablePackages.Add(package);
 
                 var packageInfo = packageInfos.ToList()[0];
                 string fileName;
@@ -137,14 +146,17 @@ namespace Cocoa
                 }
             }
 
-            var sb = new StringBuilder();
-            sb.Append(@"install");
-            packages.ToList().ForEach(x => sb.Append(@" " + x));
-            sb.Append(@" -source " + tempDir);
-
-            using (var choco = new ChocolateyHost())
+            if (availablePackages.Count != 0)
             {
-                choco.ExecInteractive(sb.ToString());
+                var sb = new StringBuilder();
+                sb.Append(@"install");
+                availablePackages.ForEach(x => sb.Append(@" " + x));
+                sb.Append(@" -source " + tempDir);
+
+                using (var choco = new ChocolateyHost())
+                {
+                    choco.ExecInteractive(sb.ToString());
+                }
             }
         }
     }
